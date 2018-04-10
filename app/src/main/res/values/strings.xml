@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Na-At</string>
+    <string name="new_worker">New Worker</string>
+    <string name="name">Name</string>
+    <string name="email">Email</string>
+    <string name="job">Job</string>
+    <string name="update">Update</string>
+    <string name="delete">Delete</string>
+    <string name="worker_key">Worker key</string>
+    <string name="save_entry">Save Entry</string>
+    <string name="save_entry_warning">The following entry is going to be saved\\nDo you want to continue?</string>
+    <string name="fill_all_fields">Fill all fields</string>
+    <string name="error">There was an error. Please try again!</string>
+    <string name="search">Search</string>
+</resources>
