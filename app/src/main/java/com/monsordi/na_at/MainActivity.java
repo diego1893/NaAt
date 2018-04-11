@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -12,6 +14,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -24,11 +28,21 @@ import com.monsordi.na_at.web.VolleySingleton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ir.mirrajabi.searchdialog.SimpleSearchDialogCompat;
+import ir.mirrajabi.searchdialog.SimpleSearchFilter;
+import ir.mirrajabi.searchdialog.core.BaseSearchDialogCompat;
+import ir.mirrajabi.searchdialog.core.FilterResultListener;
+import ir.mirrajabi.searchdialog.core.SearchResultListener;
+import ir.mirrajabi.searchdialog.core.Searchable;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TextWatcher {
 
     private static final int NEW_TASK = 0;
     private static final int NEW_ENTRY = 1;
@@ -39,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.main_list)
     ListView listView;
+    @BindView(R.id.main_search)
+    TextView searchTextView;
 
     private SqlController sqlController;
     private WorkerAdapter adapter;
@@ -48,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        searchTextView.addTextChangedListener(this);
+
         sqlController = new SqlController(this);
 
         adapter = new WorkerAdapter(this, null);
@@ -55,6 +73,29 @@ public class MainActivity extends AppCompatActivity {
         registerForContextMenu(listView);
         notifyDataSetChanged();
     }
+
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        if(!s.equals("")){
+            Cursor cursor = sqlController.readData(FeedEntry.TABLE_NAME, new String[]{FeedEntry._ID, FeedEntry.COLUMN_NAME, FeedEntry.COLUMN_EMAIL,
+                    FeedEntry.COLUMN_JOB, FeedEntry.COLUMN_IMAGE},FeedEntry.COLUMN_NAME + " LIKE '%" + s.toString() + "%'",null,null,null,
+                    null,null);
+            adapter.swapCursor(cursor);
+        }
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
+    }
+
+    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     private void notifyDataSetChanged() {
         Cursor cursor = sqlController.selectColumnsFromDb(FeedEntry.TABLE_NAME, new String[]{FeedEntry._ID, FeedEntry.COLUMN_NAME, FeedEntry.COLUMN_EMAIL, FeedEntry.COLUMN_JOB, FeedEntry.COLUMN_IMAGE});
@@ -100,9 +141,6 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, NewEntryActivity.class);
                 startActivityForResult(intent, NEW_ENTRY);
                 break;
-
-            case R.id.search:
-                break;
         }
         return true;
     }
@@ -122,5 +160,6 @@ public class MainActivity extends AppCompatActivity {
                     notifyDataSetChanged();
                 break;
         }
+        searchTextView.setText("");
     }
 }

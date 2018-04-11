@@ -11,10 +11,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.ServerError;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.bumptech.glide.Glide;
@@ -46,6 +53,8 @@ public class NewEntryActivity extends AppCompatActivity implements View.OnClickL
     EditText jobEditText;
     @BindView(R.id.new_entry_done_button)
     FloatingActionButton doneButton;
+    @BindView(R.id.background)
+    ImageView background;
 
     private boolean isImageSelected = true;
     private int id = -1;
@@ -71,6 +80,9 @@ public class NewEntryActivity extends AppCompatActivity implements View.OnClickL
             Cursor cursor = sqlController.selectColumnsFromDbWhereId(FeedEntry.TABLE_NAME,new String[]{FeedEntry.COLUMN_NAME,FeedEntry.COLUMN_EMAIL,FeedEntry.COLUMN_JOB,FeedEntry.COLUMN_IMAGE},String.valueOf(id));
             Worker currentWorker = new Worker(cursor);
             setUI(currentWorker);
+        }else {
+            profileImage.setVisibility(View.GONE);
+            background.setVisibility(View.GONE);
         }
     }
 
@@ -105,7 +117,22 @@ public class NewEntryActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onErrorResponse(VolleyError error) {
-        setResult(RESULT_INTERNET_ERROR);
+        if (error instanceof TimeoutError || error instanceof NoConnectionError) {
+            setResult(RESULT_INTERNET_ERROR);
+        } else if (error instanceof AuthFailureError ||
+                error instanceof ServerError ||
+                error instanceof NetworkError
+                || error instanceof ParseError) {
+            String imageUrl = "https://www.jamf.com/jamf-nation/img/default-avatars/generic-user-purple.png";
+            Worker worker = new Worker(name,email,job,imageUrl);
+
+            if(id!=-1)
+                sqlController.editDataWhereId(FeedEntry.TABLE_NAME,worker,String.valueOf(id));
+            else
+                sqlController.saveData(FeedEntry.TABLE_NAME,worker);
+
+            setResult(RESULT_OK);
+        }
         NavUtils.navigateUpFromSameTask(this);
     }
 

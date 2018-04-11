@@ -49,6 +49,7 @@ public class SqlController {
         String query = "=?";
         return readData(tableName,columns, FeedReaderContract.FeedEntry._ID + query,new String[]{id},null,null,null,null);
     }
+
     public void closeDatabase(){
         mDbHelper.close();
     }

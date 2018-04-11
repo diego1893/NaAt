@@ -13,7 +13,10 @@ public class JsonManager {
     private static final String JSON_EXTENSION = "?alt=json";
 
     private static String getEmailId(String email){
-        return email.substring(0,email.lastIndexOf('@'));
+        if(email.contains("@")) {
+            return email.substring(0, email.lastIndexOf('@'));
+        }
+        return null;
     }
 
     public static String getImageRequestingUrl(String email){

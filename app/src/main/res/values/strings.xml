@@ -12,4 +12,5 @@
     <string name="fill_all_fields">Fill all fields</string>
     <string name="error">There was an error. Please try again!</string>
     <string name="search">Search</string>
+    <string name="hint_search">Search by name...</string>
 </resources>

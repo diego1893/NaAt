@@ -5,6 +5,8 @@ import android.database.Cursor;
 import com.monsordi.na_at.sqlite.FeedReaderContract.FeedEntry;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by diego on 09/04/18.
